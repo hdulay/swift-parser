@@ -1,11 +1,17 @@
 # swift-parser
 ![image](../images/confluent-logo-300-2.png)
 
-# IBM MQ demo
+## Prerequisit - downlaod mysql driver
 
-This repository demonstrates how to use the IBM MQ connector. Two connectors will be started up: Datagen source, to mock clickstream data and IBM MQ Connetor source. Then we'll use KSQL to join the two sources together. No sink connector is configured.
+Please download a mysql jdbc driver and place it into the mysql directory. The jar will be placed into the connector container so that the jdbc sink connecter can locate it.
+
+## IBM MQ
+
+IBM MQ is running in a docker container. IBM MQ source connector will read from it and send it to Confluent Platform.
 
 ## Make commands
+
+Execute these commands. See the Makefile for details.
 
 ```bash
 make build

@@ -50,7 +50,7 @@ public class App {
              */
             try(ByteArrayInputStream bais = new ByteArrayInputStream(raw.getBytes())) {
                 MT103 mt = MT103.parse(Lib.readStream(bais, null));
-                GenericRecord mt103 = getGenericRecord(mt, raw);
+                GenericRecord mt103 = getGenericRecord(k, mt, raw);
                 return mt103;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -64,12 +64,14 @@ public class App {
 
         data.print(Printed.toSysOut());
 
+        // Message routing using branch method
         KStream<String, GenericRecord>[] branches = data.branch(
                 (key, value) -> (value.get("raw") == null), // missing the raw field, then must be error
                 (key, value) -> true
         );
 
-        branches[0].to("errors"); // output topic
+        // Branches can have different sink topics
+        branches[0].to("errors"); // error topic
         branches[1].to("mt103"); // output topic
 
         KafkaStreams streams = new KafkaStreams(builder.build(), props);
@@ -82,13 +84,25 @@ public class App {
         Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
     }
 
-    private static GenericRecord getGenericRecord(MT103 mt, String raw) throws IOException {
+    /**
+     * Construct the AVRO generic record from the swift message. AVRO will help downstream consumers
+     * to make integration a lot easier.
+     *
+     * @param key - kafka key
+     * @param mt - the swift message object
+     * @param raw - the raw swift message
+     * @return the generic avro record
+     * @throws IOException - if the avro schema could not be read
+     */
+    private static GenericRecord getGenericRecord(String key, MT103 mt, String raw) throws IOException {
         try(InputStream is = App.class.getClassLoader().getResourceAsStream("mt103.avsc")) {
             String schemaStr = new String(IOUtils.toByteArray(is));
 
             Schema.Parser parser = new Schema.Parser();
             Schema schema = parser.parse(schemaStr);
             GenericRecord avroRecord = new GenericData.Record(schema);
+
+            avroRecord.put("id", key);
             avroRecord.put("sender", mt.getSender());
             avroRecord.put("receiver", mt.getReceiver());
 
@@ -102,7 +116,7 @@ public class App {
 
             avroRecord.put("amount", f.getCurrency()+" "+f.getAmount());
 
-            avroRecord.put("raw", raw);
+            avroRecord.put("raw", raw.substring(0,255));
             return avroRecord;
         }
     }

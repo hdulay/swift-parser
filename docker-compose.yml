@@ -84,7 +84,8 @@ services:
     volumes:
       - ./mqlibs:/usr/share/java/kafka-connect-ibmmq/mqlibs
       - ./ibmmq:/ibmmq
-      - ./clickstream:/clickstream
+      - ./mysql:/mysql
+      - ./mysql:/usr/share/java/kafka-connect-jdbc/mysql
 
   control-center:
     image: confluentinc/cp-enterprise-control-center:6.0.1
@@ -170,4 +171,18 @@ services:
       MQ_QMGR_NAME: MQ1
     volumes:
       - .:/project
+
+  mysql:
+    image: mysql
+    hostname: mysql
+    container_name: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - 1521:1521
+    environment:
+      MYSQL_ROOT_PASSWORD: pwd
+    volumes:
+      - ./mysql:/docker-entrypoint-initdb.d
+
       

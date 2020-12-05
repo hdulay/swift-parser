@@ -1,0 +1,16 @@
+{
+	"connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+	"connection.url": "jdbc:mysql://mysql:3306/demo?autoCommit=true",
+    "connection.user": "confluent",
+    "connection.password":"pwd",
+    "insert.mode":"upsert",
+    "table.name.format":"kafka_${topic}",
+    "pk.mode":"record_key",
+    "pk.fields":"id",
+    "auto.create":"true",
+    "auto.evolve":"true",
+	"confluent.topic.replication.factor": "1",
+	"name": "mysql-mt103",
+	"topics": "mt103",
+	"producer.interceptor.classes":"io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
+}

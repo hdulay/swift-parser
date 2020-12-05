@@ -4,3 +4,5 @@ mqlibs/*
 target
 .classpath
 .project
+*.tar.gz
+*.jar

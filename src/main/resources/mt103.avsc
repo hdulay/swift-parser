@@ -3,6 +3,7 @@
     "namespace": "com.github.hdulay.swift.avro",
     "name": "mt103",
     "fields": [
+      { "name": "id", "type": "string" },
       { "name": "sender", "type": "string" },
       { "name": "receiver", "type": "string" },
       { "name": "Field20", "type": "string" },
