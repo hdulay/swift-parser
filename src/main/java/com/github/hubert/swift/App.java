@@ -120,8 +120,7 @@ public class App {
              * AVRO string maps to mysql VARCHAR(256). need to truncate or precreate your destination
              * table to have a bigger raw column.
              */
-            avroRecord.put("raw", raw.substring(0,255)); //
-                                                    //
+            avroRecord.put("raw", raw.substring(0,255));
 
             return avroRecord;
         }
