@@ -1,6 +1,6 @@
 # swift-parser
 
-```mermaid_
+```mermaid
 graph LR
 A[IBM MQ] -->B(IBM MQ Source Connector) -->|IBMMQ Topic| C{KStream Swift Parser & Router}
     C -->|Error Topic| D[Error Topic]
