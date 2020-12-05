@@ -1,10 +1,25 @@
 # swift-parser
 
-```mermaid
-graph TD
-A[IBM MQ] -->B(IBM MQ Source) -->|IBMMQ| K((Confluent Platform)) -->|IBMMQ| C{KStream Swift}
-C -->|Error Topic| K -->D[Dashboard]
-C -->|MT103 Topic| K -->E(JDBC Sink) --> F[(MySQL)]
+```text
+                                                   +--------------+
++------------+                                     |              |
+|            |                                     |              |
+|            |         +-----------------+         |  Kafka       |
+|  IBMMQ     | +-----> | IBMMQ Connector | +---->  |              |
+|            |         |                 |         |              |      +--------------+
+|            |         +-----------------+         |              | +--> |              |
++------------+                                     |              |      | KStreams     |
+                                                   |              |      | Swift        |
+                                                   |              | <--+ | Parse/Route  |
+                                                   |              |      |              |
+ +------------+        +-----------------+         |              |      +--------------+
+ |            |        | JDBC Sink       |         |              |
+ |            | <----+ |                 | <----+  |              |
+ | MySQL      |        +-----------------+         |              |
+ |            |                                    |              |
+ |            |                                    |              |
+ +------------+                                    |              |
+                                                   +--------------+
 
 ```
 
