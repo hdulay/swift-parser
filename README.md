@@ -1,7 +1,14 @@
 # swift-parser
-![image](../images/confluent-logo-300-2.png)
 
-## Prerequisit - downlaod mysql driver
+```mermaid
+graph LR
+A[IBM MQ] -->B(IBM MQ Source Connector) -->|IBMMQ Topic| C{KStream Swift Parser & Router}
+    C -->|Error Topic| D[Error Topic]
+    C -->|MT103 Topic| E(JDBC Sink MySQL) --> F[MySQL]
+
+```
+
+## Prerequisite - downlaod mysql driver
 
 Please download a mysql jdbc driver and place it into the mysql directory. The jar will be placed into the connector container so that the jdbc sink connecter can locate it.
 
