@@ -86,36 +86,6 @@ Run the ibmmq consumer to see messages coming in from `DEV.QUEUE.1`
 make consumer
 ```
 
-## KSQL
+## KStream application
 
-### Create the stream from the CLICKSTREAM topic in C3
-
-Make sure to leave the timestamp blank to use the topic timestamp by default
-
-![clickstream stream](images/create-clickstream-stream.png)
-
-## Add anothermessage to DEV.QUEUE.1
-
-You can use the user names `bobk_43` or `akatz1022` to capture clickstreams for those users with a KSQL join.
-
-## Create the Stream for the IBMMQ topic
-
-This time we will use KSQL to create the stream. Paste the KSQL statement into the KSQL Editor.
-
-```sql
-CREATE STREAM ibmmq
-  WITH (KAFKA_TOPIC='ibmmq',
-        VALUE_FORMAT='AVRO');
-```
-
-## JOIN the 2 streams
-
-Paste the KSQL statement into the KSQL Editor to perform the join.
-
-```sql
-select  * from  CLICKSTREAM
-join  IBMMQ WITHIN 5 seconds
-on text = username;
-```
-
-![join](images/join.png)
+Debug through the application using your IDE then place a swift message into the IBM MQ
