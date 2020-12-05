@@ -1,10 +1,10 @@
 # swift-parser
 
 ```mermaid
-graph LR
-A[IBM MQ] -->B(IBM MQ Source Connector) -->|IBMMQ Topic| C{KStream Swift Parser & Router}
-    C -->|Error Topic| D[Error Topic]
-    C -->|MT103 Topic| E(JDBC Sink MySQL) --> F[MySQL]
+graph TD
+A[IBM MQ] -->B(IBM MQ Source) -->|IBMMQ| K((Confluent Platform)) -->|IBMMQ| C{KStream Swift}
+C -->|Error Topic| K -->D[Dashboard]
+C -->|MT103 Topic| K -->E(JDBC Sink) --> F[(MySQL)]
 
 ```
 
