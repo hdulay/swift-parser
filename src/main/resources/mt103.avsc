@@ -1,0 +1,13 @@
+{
+    "type": "record",
+    "namespace": "com.github.hdulay.swift.avro",
+    "name": "mt103",
+    "fields": [
+      { "name": "sender", "type": "string" },
+      { "name": "receiver", "type": "string" },
+      { "name": "Field20", "type": "string" },
+      { "name": "value_date", "type": "long" },
+      { "name": "amount", "type": "string" },
+      { "name": "raw", "type": "string" }
+    ]
+} 

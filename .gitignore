@@ -1,0 +1,6 @@
+mqlibs/*
+.idea
+.settings
+target
+.classpath
+.project
