@@ -88,4 +88,8 @@ make consumer
 
 ## KStream application
 
-Debug through the application using your IDE then place a swift message into the IBM MQ
+Debug through the application using your IDE then place a swift message into the IBM MQ. Alternatively you can run the command below.
+
+```bash
+make kstream
+```
