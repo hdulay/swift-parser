@@ -27,6 +27,7 @@ connect:
 		http://connect:8083/connectors/mysql-mt103/config 
 
 kstream:
+	mvn clean package
 	mvn exec:java -D"exec.mainClass"="com.github.hubert.swift.App"
 
 down:
