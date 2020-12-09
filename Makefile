@@ -28,7 +28,7 @@ connect:
 
 kstream:
 	mvn clean package
-	mvn exec:java -D"exec.mainClass"="com.github.hubert.swift.App"
+	mvn exec:java -D"exec.mainClass"="com.github.hubert.swift.App" 1> /dev/null
 
 down:
 	docker-compose down
