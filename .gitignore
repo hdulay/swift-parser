@@ -6,3 +6,4 @@ target
 .project
 *.tar.gz
 *.jar
+ksql.sql

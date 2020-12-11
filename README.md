@@ -66,6 +66,22 @@ Debug through the application using your IDE then place a swift message into the
 make kstream
 ```
 
+## MYSQL
+
+```bash
+make mysqlcli
+```
+
+```sql
+select * from demo.kafka_mt103;
+```
+
+## KSQLDB
+
+```sql
+
+```
+
 ## Show AVRO schema in C3 topics
 
 Goto the link below to view the AVRO schema the datagen connector registered to schema registry.

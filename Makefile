@@ -30,6 +30,13 @@ kstream:
 	mvn clean package
 	mvn exec:java -D"exec.mainClass"="com.github.hubert.swift.App" 1> /dev/null
 
+ksql:
+	docker exec -it ksql-cli ksql http://ksql-server:8088
+
+
+mysqlcli:
+	docker exec -it mysql mysql -uconfluent -ppwd
+
 down:
 	docker-compose down
 	-rm -rf mqlibs/*
