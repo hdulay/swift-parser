@@ -58,6 +58,14 @@ UserName=admin
 Password=passw0rd
 ```
 
+## KStream application
+
+Debug through the application using your IDE then place a swift message into the IBM MQ. Alternatively you can run the command below.
+
+```bash
+make kstream
+```
+
 ## Show AVRO schema in C3 topics
 
 Goto the link below to view the AVRO schema the datagen connector registered to schema registry.
@@ -77,19 +85,3 @@ You need to send a message to IBM MQ before the schema will appear in the topic 
 - You can now see the schema assigned to the `ibmmq` topic
 
 ![ibmmq topic](images/ibmmq-schema.png)
-
-## AVRO message appear in consumer
-
-Run the ibmmq consumer to see messages coming in from `DEV.QUEUE.1`
-
-```bash
-make consumer
-```
-
-## KStream application
-
-Debug through the application using your IDE then place a swift message into the IBM MQ. Alternatively you can run the command below.
-
-```bash
-make kstream
-```
