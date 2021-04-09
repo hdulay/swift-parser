@@ -11,3 +11,4 @@ CREATE TABLE "kafka_mt103" (
 
 SELECT "id", "sender", "receiver" FROM "ADMIN"."kafka_mt103";
 SELECT count(*) FROM "ADMIN"."kafka_mt103";
+SELECT * FROM "ADMIN"."kafka_mt103";

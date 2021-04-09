@@ -42,16 +42,16 @@ This demo uses `docker`. Please have it installed as well as `docker-compose`.
 ```Makefile
 # DOCKER COMPOSE ENV VARIABLES
 export BOOTSTRAP_SERVERS={{ BOOTSTRAP_SERVERS }}:9092
-export SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule   required username='{{ CONFLUENT KEY }}'   password='{{  SECRET }}';
+export SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule   required username='{{ CONFLUENT KEY }}'   password='{{ SECRET }}';
 export SASL_JAAS_CONFIG_PROPERTY_FORMAT=org.apache.kafka.common.security.plain.PlainLoginModule   required username='{{ CONFLUENT KEY }}'   password='{{  SECRET }}';
 export REPLICATOR_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule   required username='{{ CONFLUENT KEY }}'   password='{{  SECRET }}';
 export BASIC_AUTH_CREDENTIALS_SOURCE=USER_INFO
 export SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO={{ SR KEY }}:{{ SR SECRET }}
-export SCHEMA_REGISTRY_URL=CHANGEME
+export SCHEMA_REGISTRY_URL={{ SR URL }
 
 # Creds
 CLOUD_KEY={{ CONFLUENT KEY }}
-CLOUD_SECRET={{  SECRET }}
+CLOUD_SECRET={{ SECRET }}
 
 # Confluent Cloud environment
 ENV=
@@ -93,14 +93,6 @@ UserName=admin
 Password=passw0rd
 ```
 
-## KStream application
-
-Run the kstream swift parser/router. This section uses maven to run the application. You will need to modify the pom.xml to create an UBER jar to run as `java -jar`.
-
-```bash
-make kstream
-```
-
 ## Oracle
 
 This command uses sqlplus
@@ -109,9 +101,60 @@ This command uses sqlplus
 make oracle
 ```
 
+Create the table to which the jdbc sink connector will writee
+
 ```sql
-select * from demo.kafka_mt103;
+CREATE TABLE "kafka_mt103" (
+    "id" VARCHAR2(128) NOT NULL,
+    "sender" VARCHAR2(128) NOT NULL,
+    "receiver" VARCHAR2(128),
+    "Field20" VARCHAR(128),
+    "value_date" NUMBER(19,0),
+    "amount" VARCHAR2(128),
+    "raw" CLOB,
+    PRIMARY KEY("id")
+);
+
+-- When messages arrive, run this statement
+SELECT * FROM "{{ OWNER }}"."kafka_mt103";
 ```
+
+## KStream application
+
+Run the kstream swift parser/router. This section uses maven to run the application. You will need to modify the pom.xml to create an UBER jar to run as `java -jar`.
+
+Create a configuration file
+
+```properties
+# KStream swift parser app
+intopic=ibmmq
+outtopic=mt103
+errortopic=invalid
+application.id=swift-parser
+client.id=swift-parser-example
+
+# Required connection configs for Kafka producer, consumer, and admin
+bootstrap.servers={{ BOOTSTRAP_SERVERS }}
+security.protocol=SASL_SSL
+sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule   required username='{{ CONFLUENT KEY }}'   password='{{  SECRET }}';
+sasl.mechanism=PLAIN
+# Required for correctness in Apache Kafka clients prior to 2.6
+client.dns.lookup=use_all_dns_ips
+
+# Best practice for Kafka producer to prevent data loss
+acks=all
+
+# Required connection configs for Confluent Cloud Schema Registry
+schema.registry.url={{ SR URL }}
+basic.auth.credentials.source=USER_INFO
+basic.auth.user.info={{ SR KEY }}:{{ SR SECRET }}
+```
+
+```bash
+make kstream
+```
+
+
 
 ## Show AVRO schema
 
