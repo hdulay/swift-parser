@@ -9,4 +9,5 @@ CREATE TABLE "kafka_mt103" (
     PRIMARY KEY("id")
 );
 
-SELECT * FROM "ADMIN"."kafka_mt103";
+SELECT "id", "sender", "receiver" FROM "ADMIN"."kafka_mt103";
+SELECT count(*) FROM "ADMIN"."kafka_mt103";

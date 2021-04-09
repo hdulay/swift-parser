@@ -54,7 +54,7 @@ public class App {
                 GenericRecord mt103 = getGenericRecord(k, mt, raw);
                 return mt103;
             } catch (Exception e) {
-                e.printStackTrace();
+//                e.printStackTrace();
 
                 // you should create an error avro message and populate it with error details
                 // and the original message and return it. you can "branch" it to route these
