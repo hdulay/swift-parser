@@ -7,3 +7,11 @@ target
 *.tar.gz
 *.jar
 ksql.sql
+*secrets*
+*.properties
+.terraform*
+ojdbc*
+terraform*
+connect/oracle
+connect/ibmmq
+*hubert*

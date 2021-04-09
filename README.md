@@ -15,43 +15,78 @@
  +------------+        +-----------------+         |              |      +--------------+
  |            |        | JDBC Sink       |         |              |
  |            | <----+ |                 | <----+  |              |
- | MySQL      |        +-----------------+         |              |
- |            |                                    |              |
+ | Oracle     |        +-----------------+         |              |
+ | RDS        |                                    |              |
  |            |                                    |              |
  +------------+                                    |              |
                                                    +--------------+
 
 ```
 
-## Prerequisite - downlaod mysql driver
+## Prerequisite - downlaod oracle jdbc driver & ibmmq client jars
 
-Please download a mysql jdbc driver and place it into the mysql directory. The jar will be placed into the connector container so that the jdbc sink connecter can locate it.
+Please download a oracle jdbc driver and create/place it into **connect/oracle** directory. The jar will be placed into the connector container so that the jdbc sink connecter can locate it.
 
-## IBM MQ
+Likewise, download the IBM MQ client jars and create/place them into `connect/ibmmq` directory so the IBM MQ source connector can load them.
 
-IBM MQ is running in a docker container. IBM MQ source connector will read from it and send it to Confluent Platform.
+This demo uses `docker`. Please have it installed as well as `docker-compose`.
 
-## Make commands
+1. Go to Confluent Cloud and create a Kafka cluster.
+1. Install the `ccloud` cli. Instructions are in the Confluent Cloud UI.
+1. Install `jq` to parse json responses from rest commands.
+1. Install maven (`mvn`) tool.
+1. Install sqlplus to connect to Oracle.
 
-Execute these commands. See the Makefile for details.
+## Makefile
+
+```Makefile
+# DOCKER COMPOSE ENV VARIABLES
+export BOOTSTRAP_SERVERS={{ BOOTSTRAP_SERVERS }}:9092
+export SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule   required username='{{ CONFLUENT KEY }}'   password='{{  SECRET }}';
+export SASL_JAAS_CONFIG_PROPERTY_FORMAT=org.apache.kafka.common.security.plain.PlainLoginModule   required username='{{ CONFLUENT KEY }}'   password='{{  SECRET }}';
+export REPLICATOR_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule   required username='{{ CONFLUENT KEY }}'   password='{{  SECRET }}';
+export BASIC_AUTH_CREDENTIALS_SOURCE=USER_INFO
+export SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO={{ SR KEY }}:{{ SR SECRET }}
+export SCHEMA_REGISTRY_URL=CHANGEME
+
+# Creds
+CLOUD_KEY={{ CONFLUENT KEY }}
+CLOUD_SECRET={{  SECRET }}
+
+# Confluent Cloud environment
+ENV=
+# Confluent Cloud cluster id
+CLUSTER=
+# Connect hostname ( localhost for docker )
+CONNECT=localhost
+```
+
+Execute these commands. See the Makefile for details. This will build the docker images to pre-install the connectors (ibmmq & jdbc sink for oracle). This will also create a connect cluster into which you will deploy connector configurations.
 
 ```bash
 make build
 make cluster
 # wait a minute for cluster to spinup
+# you can run this command to check the status of the connect cluster before moving forward
+make status
 ```
 
 ## Make the topics and connectors
 
+Create the topics in you Confluent Cloud Kafka cluster. You will need `ccloud cli installed and be logged in`.
+
+The connect configurations will be deployed into the connect cluster.
+
 ```bash
 make topic
-make connect
+make connectors
 # wait a minute before moving on to the next step
+
 ```
 
 ## Open the IBM MQ Dashboard
 
-[log in](https://localhost:9443/ibmmq/console/login.html)
+[log into the IBMMQ console](https://localhost:9443/ibmmq/console/login.html) to send swift messages
 
 ```conf
 UserName=admin
@@ -60,29 +95,25 @@ Password=passw0rd
 
 ## KStream application
 
-Debug through the application using your IDE then place a swift message into the IBM MQ. Alternatively you can run the command below.
+Run the kstream swift parser/router. This section uses maven to run the application. You will need to modify the pom.xml to create an UBER jar to run as `java -jar`.
 
 ```bash
 make kstream
 ```
 
-## MYSQL
+## Oracle
+
+This command uses sqlplus
 
 ```bash
-make mysqlcli
+make oracle
 ```
 
 ```sql
 select * from demo.kafka_mt103;
 ```
 
-## KSQLDB
-
-```sql
-
-```
-
-## Show AVRO schema in C3 topics
+## Show AVRO schema
 
 Goto the link below to view the AVRO schema the datagen connector registered to schema registry.
 ![clickstream schema](images/clickstream-schema.png)

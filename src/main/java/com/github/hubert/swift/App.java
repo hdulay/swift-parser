@@ -12,12 +12,16 @@ import org.apache.avro.generic.GenericRecord;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
+import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.KeyValueMapper;
 import org.apache.kafka.streams.kstream.Printed;
+import sun.net.www.http.KeepAliveCache;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -27,18 +31,15 @@ import java.util.Properties;
  *
  */
 public class App {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         StreamsBuilder builder = new StreamsBuilder();
 
         Properties props = new Properties();
-        props.put(StreamsConfig.APPLICATION_ID_CONFIG, "swift-parser-example");
-        props.put(StreamsConfig.CLIENT_ID_CONFIG, "swift-parser-example");
-        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        props.put("schema.registry.url", "http://localhost:8081");
+        props.load(new FileInputStream(args.length == 0 ? "kstream.properties" : args[0]));
         props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
         props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, GenericAvroSerde.class);
 
-        KStream<String, GenericRecord> swiftMessages = builder.stream("ibmmq"); // input topic
+        KStream<String, GenericRecord> swiftMessages = builder.stream(props.getProperty("intopic")); // input topic
 
         KStream<String, GenericRecord> data = swiftMessages.mapValues((k, v) -> {
 
@@ -52,7 +53,7 @@ public class App {
                 MT103 mt = MT103.parse(Lib.readStream(bais, null));
                 GenericRecord mt103 = getGenericRecord(k, mt, raw);
                 return mt103;
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
 
                 // you should create an error avro message and populate it with error details
@@ -71,8 +72,10 @@ public class App {
         );
 
         // Branches can have different sink topics
-        branches[0].to("errors"); // error topic
-        branches[1].to("mt103"); // output topic
+        branches[0].to(props.getProperty("errortopic")); // error topic
+        branches[1].
+                map((key, value) -> new KeyValue<>(value.get("id").toString(), value)).
+                to(props.getProperty("outtopic")); // output topic
 
         KafkaStreams streams = new KafkaStreams(builder.build(), props);
         streams.start();
@@ -102,7 +105,7 @@ public class App {
             Schema schema = parser.parse(schemaStr);
             GenericRecord avroRecord = new GenericData.Record(schema);
 
-            avroRecord.put("id", key);
+            avroRecord.put("id", mt.getMtId().id());
             avroRecord.put("sender", mt.getSender());
             avroRecord.put("receiver", mt.getReceiver());
 

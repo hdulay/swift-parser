@@ -1,0 +1,85 @@
+# DOCKER COMPOSE ENV VARIABLES
+export BOOTSTRAP_SERVERS={{ BOOTSTRAP_SERVERS }}:9092
+export SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule   required username='{{ CONFLUENT KEY }}'   password='{{  SECRET }}';
+export SASL_JAAS_CONFIG_PROPERTY_FORMAT=org.apache.kafka.common.security.plain.PlainLoginModule   required username='{{ CONFLUENT KEY }}'   password='{{  SECRET }}';
+export REPLICATOR_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule   required username='{{ CONFLUENT KEY }}'   password='{{  SECRET }}';
+export BASIC_AUTH_CREDENTIALS_SOURCE=USER_INFO
+export SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO={{ SR KEY }}:{{ SR SECRET }}
+export SCHEMA_REGISTRY_URL=CHANGEME
+
+# Creds
+CLOUD_KEY={{ CONFLUENT KEY }}
+CLOUD_SECRET={{  SECRET }}
+
+# Confluent Cloud environment
+ENV=
+# Confluent Cloud cluster id
+CLUSTER=
+# Connect hostname ( localhost for docker )
+CONNECT=localhost
+
+build:
+	docker-compose build
+
+cluster: 
+	docker-compose up
+
+ibmjars:
+	docker-compose up -d ibmmq
+	-docker exec -it -e LICENSE=accept -e MQ_QMGR_NAME=MQ1 ibmmq cp -Ra /opt/mqm/java/lib/  /project/mqlibs
+
+topic:
+	ccloud kafka topic create ibmmq --environment $(ENV) --cluster $(CLUSTER)  --if-not-exists  
+	ccloud kafka topic create mt103 --environment $(ENV) --cluster $(CLUSTER)  --if-not-exists  
+	ccloud kafka topic create invalid --environment $(ENV) --cluster $(CLUSTER)  --if-not-exists  
+
+connectors:
+	docker exec -it connect confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:10.1.0
+	docker exec -it connect confluent-hub install --no-prompt confluentinc/kafka-connect-ibmmq:11.0.2
+	docker-compose restart connect
+
+deploy:
+	# FOR DEPLOYING SELF MANAGED
+	# curl -d "@ibmmq/ibmmq-connect.json" \
+	# 	-X PUT \
+	# 	-H "Content-Type: application/json" \
+	# 	http://$(CONNECT):8083/connectors/ibmmq-source/config 
+
+	# FOR DEPLOYING IN DOCKER
+	curl -d "@ibmmq/ibmmq-connect-docker.json" \
+		-X PUT \
+		-H "Content-Type: application/json" \
+		http://$(CONNECT):8083/connectors/ibmmq-source/config 
+
+	curl -d "@oracle/oracle-sink-connect.json" \
+		-X PUT \
+		-H "Content-Type: application/json" \
+		http://$(CONNECT):8083/connectors/oracle-mt103/config 
+
+
+status:
+	curl http://$(CONNECT):8083 | jq
+
+list:
+	curl http://$(CONNECT):8083/connectors | jq
+	curl http://$(CONNECT):8083/connectors/ibmmq-source/status | jq
+	curl http://$(CONNECT):8083/connectors/oracle-mt103/status | jq
+	
+kstream:
+	mvn clean package
+	mvn exec:java -D"exec.mainClass"="com.github.hubert.swift.App" 1> /dev/null
+
+down:
+	docker-compose down
+
+cibmmq:
+	ccloud kafka topic consume ibmmq -b --print-key --value-format avro --environment $(ENV) --cluster $(CLUSTER) --group jef --api-key '$(CLOUD_KEY)' --api-secret '$(CLOUD_SECRET)'
+
+cmt103:
+	ccloud kafka topic consume mt103 --print-key -b --value-format avro --environment $(ENV) --cluster $(CLUSTER) --group jef --api-key '$(CLOUD_KEY)' --api-secret '$(CLOUD_SECRET)' 
+
+cinvalid:
+	ccloud kafka topic consume invalid --print-key -b --value-format avro --environment $(ENV) --cluster $(CLUSTER) --group jef --api-key '$(CLOUD_KEY)' --api-secret '$(CLOUD_SECRET)' 
+
+oracle:
+	sqlplus admin/confluent@database-2.c598y8lhnjcw.us-east-1.rds.amazonaws.com:1521/ORCL 
