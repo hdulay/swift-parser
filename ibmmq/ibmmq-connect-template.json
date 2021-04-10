@@ -9,9 +9,9 @@
 	"jms.destination.name": "DEV.QUEUE.1",
 	"kafka.topic": "ibmmq",
 	"producer.interceptor.classes":"io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor",
-	"confluent.topic.bootstrap.servers": "pkc-57gkg.us-east-1.aws.confluent.cloud:9092",
-	"confluent.license": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJjb250cm9sLWNlbnRlciIsIm5iNCI6IjE2MTc4MTc0NDgiLCJtb25pdG9yaW5nIjp0cnVlLCJsaWNlbnNlVHlwZSI6IlRyaWFsIiwiaXNzIjoiQ29uZmx1ZW50IiwiaWF0IjoxNjE3ODE3NTY4LCJleHAiOjE2MjI0NDQ0MDAsImF1ZCI6IjAwNjNhMDAwMDBpc1owM0FBRSJ9.VI_NHI6Metv8WKa3pVMbKyIN4DpUNJoasPGKyWxKNIOaM4nnNhrLgXd-6Gh4T2I86bA-p3PavquHp7dA40iBsOrYB9D91GYfFc3DhS2WDhpQhghq1XrXkMaNJhK1-eSBl-lI8FG2hWR7wA_o0gLNzO4bFcJxrSf2fvAeiaU8Zjg1-xmq9Xday0raoljsf2b4mpF-HHw-VnukGTgfIyEyEojefoeDmR14iRezfGntuwZ7ug_SwVLwyVzWhQJKEK9i_aIciGX9yndmwrzt6xXjG8cvMyje7ZEIhcOaF7GXF7cFplir_Ex3F_4jxi3VEJxFJJx7XtI8NwvVB2da_OVFmQ",
-	"confluent.topic.sasl.jaas.config":"org.apache.kafka.common.security.plain.PlainLoginModule required username=\"4ZEMG2M4Z4KYWYDN\" password=\"aD6X3xtYDlqGEvGJVFOEufpqNsIxsQShlg6MDaLhm3vFF9FWcydbXEJOtpUkrFQw\";",
+	"confluent.topic.bootstrap.servers": ":9092",
+	"confluent.license": "",
+	"confluent.topic.sasl.jaas.config":"",
 	"confluent.topic.security.protocol":"SASL_SSL",
 	"confluent.topic.sasl.mechanism":"PLAIN"
 }
