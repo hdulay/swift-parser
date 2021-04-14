@@ -79,10 +79,11 @@ The connect configurations will be deployed into the connect cluster.
 
 ```bash
 make topic
-make connectors
-# wait a minute before moving on to the next step
-
 ```
+
+### Install Connectors
+
+Follow instructions in Confluent Hub for JDBC Sink/Source connector and IBMMQ Source connector to install into your Kafka connect cluster.
 
 ## Open the IBM MQ Dashboard
 
