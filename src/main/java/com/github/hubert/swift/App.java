@@ -105,7 +105,7 @@ public class App {
             Schema schema = parser.parse(schemaStr);
             GenericRecord avroRecord = new GenericData.Record(schema);
 
-            avroRecord.put("id", mt.getMtId().id());
+            avroRecord.put("id", mt.getField20().getValue());
             avroRecord.put("sender", mt.getSender());
             avroRecord.put("receiver", mt.getReceiver());
 
